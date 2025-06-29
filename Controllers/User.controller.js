@@ -93,7 +93,8 @@ const register = async(req,res)=>{
 
   const options = {
   httpOnly: true,
-  secure: true
+  secure: true,
+  sameSite: "None",
 };
 
 
@@ -114,7 +115,7 @@ const logout = async (req, res) => {
   const options = {
   httpOnly: true,
   secure: true,
-    sameSite: "Lax", // recommended for auth
+    sameSite: "None", // recommended for auth
 };
 
   return res.status(200).clearCookie("token", options).json({
