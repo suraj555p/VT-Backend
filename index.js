@@ -20,6 +20,12 @@ app.use(cors({
   credentials: true // allow cookies (if using authentication via cookies)
 }));
 
+/*app.use(cors({
+  origin:  // allow only frontend origin
+  'http://localhost:3000',
+  credentials: true // allow cookies (if using authentication via cookies)
+}));*/
+
 app.use(express.static('public'));
 app.use(express.json());
 app.use(cookieParser());

@@ -100,8 +100,54 @@ const unsubscribe = async (req, res) => {
   }
 };
 
+// GET /api/v1/subscription/status/:targetUser
+const getSubscriptionStatus = async (req, res) => {
+  try {
+    const currentUser = req.user._id;
+    const { targetUser } = req.params;
+
+    const isSubscribed = await Subscription.findOne({
+      subscriber: currentUser,
+      channel: targetUser,
+    });
+
+    const subscribersCount = await Subscription.countDocuments({ channel: targetUser });
+
+    return res.status(200).json({
+      isSubscribed: Boolean(isSubscribed),
+      subscribersCount,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getChannels = async (req,res)=>{
+ try {
+    const currentUser = req.user._id
+  
+    const channels = await Subscription.find({subscriber: currentUser}).populate('channel','username avatarImage')
+
+      if(!channels){
+       res.status(400).json({
+         message : "channels are not found !!!"
+       })
+    }  
+
+    return res.status(201).json({
+        channel: channels,
+        message : "all channels fetches successfully !!!"
+    })
+ } catch (error) {
+   return res.status(500).json({ message: "Server error" });
+ }
+}
+
+
 
 export {
    subscribe,
-   unsubscribe
+   unsubscribe,
+   getSubscriptionStatus,
+   getChannels
 }

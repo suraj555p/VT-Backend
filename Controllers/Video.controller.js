@@ -86,6 +86,33 @@ const getVideoById = async (req,res)=>{
     }
 }
 
+ const getAllChannelVideos = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // ✅ Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    // ✅ Fetch all videos uploaded by this user
+    const videos = await Video.find({ user: userId })
+      .populate('user', 'username avatarImage') // only populate user info
+      .select('title description thumbnail video createdAt') // include video field explicitly
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: 'All videos by channel fetched successfully',
+      videos,
+    });
+  } catch (error) {
+    console.error('Error fetching channel videos:', error);
+    return res.status(500).json({
+      message: 'Server error while fetching channel videos',
+      error: error.message,
+    });
+  } }
+
 const getAllUserVideos = async (req,res)=>{
     try {
          const currentUser = req.user._id
@@ -159,5 +186,6 @@ export {
     getAllVideos,
     getVideoById,
     getAllUserVideos,
+    getAllChannelVideos,
     deleteVideo
 }

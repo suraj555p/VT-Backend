@@ -162,13 +162,13 @@ const getCurrentUserChannelProfile = async (req, res) => {
 const getUserChannelProfile = async (req, res) => {
   try {
     const { username } = req.params;
-    const currentUserId = req.user._id;
+    const currentUserId = req.user?._id || null; // Optional if not logged in
 
     if (!username?.trim()) {
       return res.status(400).json({ message: "Username is missing!" });
     }
 
-    // Find the user by username
+    // Fetch the channel owner by username
     const user = await User.findOne({ username }).select(
       "fullname username email avatarImage coverImage"
     );
@@ -179,15 +179,18 @@ const getUserChannelProfile = async (req, res) => {
 
     const channelUserId = user._id;
 
-    // Count total subscribers and subscriptions
+    // Get counts
     const subscribersCount = await Subscription.countDocuments({ channel: channelUserId });
     const subscribedToCount = await Subscription.countDocuments({ subscriber: channelUserId });
 
-    // Check if current user is subscribed to this channel
-    const isSubscribed = await Subscription.exists({
-      subscriber: currentUserId,
-      channel: channelUserId,
-    });
+    // ✅ Only check subscription status if currentUserId exists
+    let isSubscribed = false;
+    if (currentUserId && currentUserId.toString() !== channelUserId.toString()) {
+      isSubscribed = await Subscription.exists({
+        subscriber: currentUserId,
+        channel: channelUserId,
+      });
+    }
 
     return res.status(200).json({
       message: "User channel fetched successfully!",
@@ -205,6 +208,7 @@ const getUserChannelProfile = async (req, res) => {
     });
   }
 };
+
 
 const changeAvatarImage = async (req,res)=>{
    try {
