@@ -15,8 +15,7 @@ ConnectDB();
 const app = express();
 
 app.use(cors({
-  origin:  // allow only frontend origin
-  'https://vt-frontend-ebon.vercel.app',
+  origin:'https://vt-frontend-ebon.vercel.app',
   credentials: true // allow cookies (if using authentication via cookies)
 }));
 
